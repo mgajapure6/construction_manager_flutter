@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:moduler_flutter_app/modules/dashboard/screens/dashboard.dart';
+import 'package:moduler_flutter_app/modules/home/screens/home.dart';
 import 'package:moduler_flutter_app/modules/login/screens/loginPage.dart';
 
 import 'package:moduler_flutter_app/modules/login/screens/welcomePage.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
       value: AuthService().authentication,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: WelcomePage(),
+        home: HomePage(),
       ),
     );
   }

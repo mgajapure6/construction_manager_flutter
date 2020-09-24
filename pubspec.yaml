@@ -34,6 +34,12 @@ dependencies:
   cloud_firestore: "^0.14.0+2"
   firebase_database: "^4.0.0"
   flushbar: ^1.10.4
+  flutter_swiper: ^1.1.6
+  flutter_custom_clippers: ^1.1.1
+  intro_views_flutter: ^2.8.1
+  wave: ^0.0.8
+  font_awesome_flutter: ^8.8.1
+  cached_network_image: ^2.2.0+1
 
 dev_dependencies:
   flutter_test:
