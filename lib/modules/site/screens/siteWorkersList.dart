@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:html';
 import 'package:flushbar/flushbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
@@ -8,53 +9,55 @@ import 'package:flutter/material.dart';
 import 'package:moduler_flutter_app/modules/login/services/auth.dart';
 import 'package:moduler_flutter_app/modules/site/models/siteModel.dart';
 import 'package:moduler_flutter_app/modules/site/screens/siteForm.dart';
-import 'package:moduler_flutter_app/modules/site/screens/siteWorkersList.dart';
 import 'package:moduler_flutter_app/modules/site/services/siteService.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
+import 'package:moduler_flutter_app/modules/worker/models/workerModel.dart';
+import 'package:moduler_flutter_app/modules/worker/services/workerService.dart';
 
-class SiteList extends StatefulWidget {
-  static const route = '/';
+class SiteWorkersList extends StatefulWidget {
+  final SiteModel siteModel;
 
-  SiteList({Key key}) : super(key: key);
+  SiteWorkersList({@required this.siteModel});
 
   @override
-  SiteListState createState() => SiteListState();
+  SiteWorkersListState createState() => SiteWorkersListState();
 }
 
-class SiteListState extends State<SiteList> {
-  StreamSubscription<QuerySnapshot> currentSubscription;
+class SiteWorkersListState extends State<SiteWorkersList> {
   bool isLoading = true;
-  List<SiteModel> sites = <SiteModel>[];
+  List<WorkerModel> freeWorkers;
 
-  SiteListState() {
-    // AuthService().currentUser().then((User user) {
-    //   if (user != null) {
-    //     currentSubscription = SiteService().loadAllSites().listen(updateSites);
-    //   }
-    // });
-
-    currentSubscription = SiteService().loadAllSites().listen(updateSites);
+  @override
+  void initState() {
+    super.initState();
+    print("id::" + widget.siteModel.id);
+    print("name::" + widget.siteModel.siteName);
   }
 
   @override
   void dispose() {
     print("dispose");
-    currentSubscription?.cancel();
     super.dispose();
   }
 
-  void updateSites(QuerySnapshot snapshot) {
-    print("updateSites");
+  StreamSubscription<QuerySnapshot> currentSubscription;
+
+  SiteWorkersListState() {
+    WorkerService().loadFreeWorkers().listen(updateFreeWorkers);
+  }
+
+  void updateFreeWorkers(QuerySnapshot snapshot) {
     setState(() {
-      sites = SiteService().getActiveSites(snapshot);
+      freeWorkers = WorkerService().getSnapshotWorkers(snapshot);
       isLoading = false;
     });
   }
 
-  Widget _newSiteButton() {
+  Widget _assignWorkerButton() {
     return InkWell(
       onTap: () {
+        print(freeWorkers.toString());
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -70,7 +73,7 @@ class SiteListState extends State<SiteList> {
               padding: EdgeInsets.only(left: 0, top: 10, bottom: 10, right: 4),
               child: Icon(Icons.add, color: Colors.black, size: 15),
             ),
-            Text('Add New Site',
+            Text('Assign Worker',
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -91,47 +94,80 @@ class SiteListState extends State<SiteList> {
             Navigator.pop(context);
           },
         ),
-        title: new Text('Site List',
+        title: new Text('Site Workers List',
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 color: Colors.black)),
         backgroundColor: Colors.transparent,
-        actions: [_newSiteButton()],
+        actions: [_assignWorkerButton()],
       ),
-      body: Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: 1280),
-          child: isLoading
-              ? CircularProgressIndicator()
-              : sites.isNotEmpty
-                  ? SiteListView(sites: sites)
-                  : EmptyListView(child: Text('No Sites Found !')),
-        ),
-      ),
+      body: Container(
+          child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: 20,
+          ),
+          RichText(
+            textAlign: TextAlign.start,
+            text: TextSpan(
+                text: widget.siteModel.siteName,
+                style: TextStyle(color: Colors.black, fontSize: 19)),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          RichText(
+            text: TextSpan(
+                text: 'Start Date : ' + widget.siteModel.siteStartDate,
+                style: TextStyle(color: Colors.black, fontSize: 14)),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          RichText(
+            text: TextSpan(
+                text: 'Owner : ' + widget.siteModel.siteOwnerName,
+                style: TextStyle(color: Colors.black, fontSize: 14)),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Center(
+            child: widget.siteModel.assignWorkers != null &&
+                    widget.siteModel.assignWorkers.length > 0
+                ? SiteWorkersListView(site: widget.siteModel)
+                : EmptyListView(
+                    child: Text('No Workers Found For This Site !')),
+          )
+        ],
+      )),
     );
   }
 }
 
-class SiteListView extends StatelessWidget {
-  final List<SiteModel> _sites;
+class SiteWorkersListView extends StatelessWidget {
+  final SiteModel _site;
 
-  SiteListView({
-    @required List<SiteModel> sites,
-  }) : _sites = sites;
+  SiteWorkersListView({
+    @required SiteModel site,
+  }) : _site = site;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: ListView(
-          children: _sites.map((site) => SiteCard(site: site)).toList()),
+          children: _site.assignWorkers
+              .map((worker) => SiteWorkerCard(site: _site, worker: worker))
+              .toList()),
     );
   }
 }
 
-class SiteCard extends StatelessWidget {
+class SiteWorkerCard extends StatelessWidget {
   final SiteModel site;
-  SiteCard({this.site});
+  final SiteWorker worker;
+  SiteWorkerCard({@required this.site, @required this.worker});
 
   _displaySnackBar(
       BuildContext context, String type, String title, String text) {
@@ -197,7 +233,7 @@ class SiteCard extends StatelessWidget {
                   child: Column(children: <Widget>[
                     Row(children: <Widget>[
                       Text(
-                        site.siteName,
+                        worker.fname + ' ' + worker.lname,
                         overflow: TextOverflow.fade,
                         softWrap: true,
                         style: TextStyle(
@@ -206,12 +242,12 @@ class SiteCard extends StatelessWidget {
                     ]),
                     Row(
                       children: <Widget>[
-                        Text("Start Date : "),
+                        Text("Start Working Date : "),
                         SizedBox(
                           width: 5,
                         ),
                         Text(
-                          site.siteStartDate,
+                          worker.workStartDate,
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w300),
                         )
@@ -219,12 +255,14 @@ class SiteCard extends StatelessWidget {
                     ),
                     Row(
                       children: <Widget>[
-                        Text("End Date : "),
+                        Text("End Working Date: "),
                         SizedBox(
                           width: 5,
                         ),
                         Text(
-                          site.siteEndDate,
+                          worker.workEndDate == null
+                              ? 'Still Working'
+                              : worker.workEndDate,
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w300),
                         )
@@ -232,84 +270,43 @@ class SiteCard extends StatelessWidget {
                     ),
                     Row(
                       children: <Widget>[
-                        Text("Owner : "),
+                        Text("Contact : "),
                         SizedBox(
                           width: 5,
                         ),
                         Text(
-                          site.siteOwnerName,
+                          worker.mobile,
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w300),
                         )
                       ],
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        Text("Budget : "),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(site.siteBudget,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.orange,
-                            ))
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(site.status,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.green,
-                            )),
                         PopupMenuButton(
                           itemBuilder: (context) => [
                             PopupMenuItem(
                               value: 1,
-                              child: Text("Edit Site"),
-                            ),
-                            PopupMenuItem(
-                              value: 2,
-                              child: Text("Delete Site"),
-                            ),
-                            PopupMenuItem(
-                              value: 3,
-                              child: Text("Site Workers"),
-                            ),
-                            PopupMenuItem(
-                              value: 4,
-                              child: Text("Site Materials"),
-                            ),
+                              child: Text("Remove"),
+                            )
                           ],
                           onCanceled: () {
                             print("You have canceled the menu.");
                           },
                           onSelected: (value) {
-                            print("value:$value");
-                            print("site name:" + this.site.siteName);
                             if (value == 1) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SiteFromPage(
-                                        flag: 'M', siteModel: site)),
-                              );
-                            } else if (value == 2) {
                               CoolAlert.show(
                                   context: context,
                                   type: CoolAlertType.confirm,
-                                  text: "Do you want to delete site ? ",
+                                  text: "Do you want to remove worker ? ",
                                   confirmBtnText: "Yes",
                                   cancelBtnText: "No",
                                   confirmBtnColor: Colors.red,
                                   onConfirmBtnTap: () {
                                     Navigator.pop(context);
-                                    Map result =
-                                        SiteService().deleteSite(site.id);
+                                    Map result = SiteService()
+                                        .removeSiteWorker(site.id, worker);
                                     if (result['status'] == 'success') {
                                       _displaySnackBar(context, 'S', 'Success',
                                           result['msg']);
@@ -318,15 +315,6 @@ class SiteCard extends StatelessWidget {
                                           result['msg']);
                                     }
                                   });
-                            } else if (value == 3) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) {
-                                  print("site print");
-                                  print(site.toJson());
-                                  return SiteWorkersList(siteModel: site);
-                                }),
-                              );
                             }
                           },
                         ),

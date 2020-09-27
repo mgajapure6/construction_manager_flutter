@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:moduler_flutter_app/modules/site/screens/siteList.dart';
+import 'package:moduler_flutter_app/modules/worker/screens/workerList.dart';
 import 'package:moduler_flutter_app/utilities/animation/animation1.dart';
 import 'package:moduler_flutter_app/utilities/animation/oval-right-clipper.dart';
 
@@ -12,10 +15,13 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var orangeTextStyle = TextStyle(
+      color: Colors.deepOrange,
+    );
     return Scaffold(
       key: _key,
       appBar: AppBar(
-        title: Text('Ligh Drawer Navigation'),
+        title: Text('Construction Manager'),
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.menu),
@@ -25,37 +31,162 @@ class HomePage extends StatelessWidget {
         ),
       ),
       drawer: _buildDrawer(),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              height: 200,
-              decoration: BoxDecoration(
-                  color: Colors.deepOrange,
-                  borderRadius: BorderRadius.circular(10.0)),
-            ),
-            SizedBox(height: 10.0),
-            Container(
-              width: double.infinity,
-              height: 200,
-              decoration: BoxDecoration(
-                  color: Colors.lightGreen,
-                  borderRadius: BorderRadius.circular(10.0)),
-            ),
-            SizedBox(height: 10.0),
-            Container(
-              width: double.infinity,
-              height: 200,
-              decoration: BoxDecoration(
-                  color: Colors.pink,
-                  borderRadius: BorderRadius.circular(10.0)),
-            ),
-          ],
-        ),
+        children: <Widget>[
+          const SizedBox(height: 16.0),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _buildMenuTile(
+                    context,
+                    FontAwesomeIcons.building,
+                    "All Sites",
+                    Colors.deepOrange.withOpacity(0.7),
+                    new SiteList()),
+              ),
+              const SizedBox(width: 16.0),
+              Expanded(
+                child: _buildMenuTile(context, FontAwesomeIcons.lock, "Workers",
+                    Colors.blue.withOpacity(0.6), new WorkerList()),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _buildMenuTile(context, FontAwesomeIcons.bookmark,
+                    "Bookmarked wikis", Colors.indigo.withOpacity(0.7), null),
+              ),
+              const SizedBox(width: 16.0),
+              Expanded(
+                child: _buildMenuTile(context, FontAwesomeIcons.file,
+                    "Templates", Colors.greenAccent, null),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          Text(
+            "Recently Opened Wikis",
+            style: orangeTextStyle,
+          ),
+          const SizedBox(height: 10.0),
+          _buildRecentWikiRow(null, "Brand Guideline"),
+          const SizedBox(height: 5.0),
+          _buildRecentWikiRow(null, "Project Grail Sprint plan"),
+          const SizedBox(height: 5.0),
+          _buildRecentWikiRow(null, "Personal Wiki"),
+          const SizedBox(height: 20.0),
+          Row(
+            children: <Widget>[
+              Text(
+                "Channels/Group",
+                style: orangeTextStyle,
+              ),
+              IconButton(
+                icon: Icon(Icons.add_circle_outline),
+                color: Colors.greenAccent,
+                onPressed: () {},
+              ),
+            ],
+          ),
+          _buildChannelListItem("Tixio 2.0"),
+          _buildChannelListItem("Project Grail"),
+          _buildChannelListItem("Fun facts"),
+        ],
       ),
     );
+  }
+
+  Row _buildChannelListItem(String title) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Icon(
+          FontAwesomeIcons.circle,
+          size: 16.0,
+        ),
+        const SizedBox(width: 10.0),
+        Text(title),
+        Spacer(),
+        IconButton(
+          icon: Icon(Icons.more_vert),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
+  Row _buildRecentWikiRow(String avatar, String title) {
+    return Row(
+      children: <Widget>[
+        CircleAvatar(
+          radius: 15.0,
+          //backgroundImage: NetworkImage(avatar),
+        ),
+        const SizedBox(width: 10.0),
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.bold,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildMenuTile(BuildContext context, IconData icon, String label,
+      Color color, dynamic classObj) {
+    return InkWell(
+        onTap: () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => classObj),
+          );
+        },
+        child: Stack(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(26.0),
+              alignment: Alignment.centerRight,
+              child: Opacity(
+                  opacity: 0.3,
+                  child: Icon(
+                    icon,
+                    size: 40,
+                    color: Colors.white,
+                  )),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    icon,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 16.0),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        ));
   }
 
   _buildDrawer() {
@@ -178,4 +309,88 @@ class HomePage extends StatelessWidget {
       ]),
     );
   }
+}
+
+class WaveClipperTwo extends CustomClipper<Path> {
+  /// reverse the wave direction in vertical axis
+  bool reverse;
+
+  /// flip the wave direction horizontal axis
+  bool flip;
+
+  WaveClipperTwo({this.reverse = false, this.flip = false});
+
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    if (!reverse && !flip) {
+      path.lineTo(0.0, size.height - 20);
+
+      var firstControlPoint = Offset(size.width / 4, size.height);
+      var firstEndPoint = Offset(size.width / 2.25, size.height - 30.0);
+      path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+          firstEndPoint.dx, firstEndPoint.dy);
+
+      var secondControlPoint =
+          Offset(size.width - (size.width / 3.25), size.height - 65);
+      var secondEndPoint = Offset(size.width, size.height - 40);
+      path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
+          secondEndPoint.dx, secondEndPoint.dy);
+
+      path.lineTo(size.width, size.height - 40);
+      path.lineTo(size.width, 0.0);
+      path.close();
+    } else if (!reverse && flip) {
+      path.lineTo(0.0, size.height - 40);
+      var firstControlPoint = Offset(size.width / 3.25, size.height - 65);
+      var firstEndPoint = Offset(size.width / 1.75, size.height - 20);
+      path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+          firstEndPoint.dx, firstEndPoint.dy);
+
+      var secondCP = Offset(size.width / 1.25, size.height);
+      var secondEP = Offset(size.width, size.height - 30);
+      path.quadraticBezierTo(
+          secondCP.dx, secondCP.dy, secondEP.dx, secondEP.dy);
+
+      path.lineTo(size.width, size.height - 20);
+      path.lineTo(size.width, 0.0);
+      path.close();
+    } else if (reverse && flip) {
+      path.lineTo(0.0, 20);
+      var firstControlPoint = Offset(size.width / 3.25, 65);
+      var firstEndPoint = Offset(size.width / 1.75, 40);
+      path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+          firstEndPoint.dx, firstEndPoint.dy);
+
+      var secondCP = Offset(size.width / 1.25, 0);
+      var secondEP = Offset(size.width, 30);
+      path.quadraticBezierTo(
+          secondCP.dx, secondCP.dy, secondEP.dx, secondEP.dy);
+
+      path.lineTo(size.width, size.height);
+      path.lineTo(0.0, size.height);
+      path.close();
+    } else {
+      path.lineTo(0.0, 20);
+
+      var firstControlPoint = Offset(size.width / 4, 0.0);
+      var firstEndPoint = Offset(size.width / 2.25, 30.0);
+      path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+          firstEndPoint.dx, firstEndPoint.dy);
+
+      var secondControlPoint = Offset(size.width - (size.width / 3.25), 65);
+      var secondEndPoint = Offset(size.width, 40);
+      path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
+          secondEndPoint.dx, secondEndPoint.dy);
+
+      path.lineTo(size.width, size.height);
+      path.lineTo(0.0, size.height);
+      path.close();
+    }
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

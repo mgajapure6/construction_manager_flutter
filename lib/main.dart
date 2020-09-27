@@ -9,6 +9,7 @@ import 'package:moduler_flutter_app/modules/login/screens/welcomePage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:moduler_flutter_app/modules/login/services/auth.dart';
 import 'package:moduler_flutter_app/modules/site/screens/siteForm.dart';
+import 'package:moduler_flutter_app/modules/site/screens/siteList.dart';
 import 'package:provider/provider.dart';
 
 //void main() => runApp(MyApp());

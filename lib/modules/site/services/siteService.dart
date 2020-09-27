@@ -4,34 +4,132 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moduler_flutter_app/modules/site/models/siteModel.dart';
 
 abstract class BaseSiteService {
-  Map creatSite(SiteModel site);
-  Future<void> updateSite();
-  Future<String> deleteSite();
-  Future<bool> fetchSites();
+  Map createSite(SiteModel site);
+  Map updateSite(SiteModel site, String id);
+  Map deleteSite(String id);
+  Stream<QuerySnapshot> loadAllSites();
+  List<SiteModel> getActiveSites(QuerySnapshot snapshot);
+  Future<SiteModel> getOne(String id);
+  Map addSiteWorker(SiteModel site, SiteWorker worker);
+  Map removeSiteWorker(String siteId, SiteWorker worker);
 }
 
 class SiteService implements BaseSiteService {
   final CollectionReference siteCollectionRef =
-      FirebaseFirestore.instance.collection('site');
+      FirebaseFirestore.instance.collection('sites');
 
   @override
-  Map creatSite(SiteModel site) {
+  Map createSite(SiteModel site) {
     var responseMap = new Map();
     try {
-      Future<DocumentReference> docRef = siteCollectionRef.add(site.toJson());
+      siteCollectionRef.add(site.toJson());
       responseMap["status"] = 'success';
+      responseMap["msg"] = 'Site save successfully.';
       return responseMap;
     } on FirebaseAuthException catch (e) {
+      print('exception:' + e.toString());
+      print('exception e.code:' + e.code);
+      responseMap["msg"] = e.message;
+      responseMap["status"] = 'failed';
       return responseMap;
     }
   }
 
   @override
-  Future<String> deleteSite() {}
+  Map deleteSite(String id) {
+    var responseMap = new Map();
+    try {
+      siteCollectionRef.doc(id).delete();
+      responseMap["status"] = 'success';
+      responseMap["msg"] = 'Site deleted successfully.';
+      return responseMap;
+    } on FirebaseAuthException catch (e) {
+      print('exception:' + e.toString());
+      print('exception e.code:' + e.code);
+      responseMap["msg"] = e.message;
+      responseMap["status"] = 'failed';
+      return responseMap;
+    }
+  }
+
+  Stream<QuerySnapshot> loadAllSites() {
+    return siteCollectionRef.snapshots();
+  }
 
   @override
-  Future<bool> fetchSites() {}
+  List<SiteModel> getActiveSites(QuerySnapshot snapshot) {
+    return snapshot.docs.map((DocumentSnapshot doc) {
+      if (doc.data()['status'] == 'Active') {
+        return SiteModel.fromSnapshot(doc);
+      }
+    }).toList();
+  }
 
   @override
-  Future<void> updateSite() {}
+  Map updateSite(SiteModel site, String id) {
+    print("updating::" + id);
+    var responseMap = new Map();
+    try {
+      siteCollectionRef.doc(id).update(site.toJson());
+      responseMap["status"] = 'success';
+      responseMap["msg"] = 'Site updated successfully.';
+      return responseMap;
+    } on FirebaseAuthException catch (e) {
+      print('exception:' + e.toString());
+      print('exception e.code:' + e.code);
+      responseMap["msg"] = e.message;
+      responseMap["status"] = 'failed';
+      return responseMap;
+    }
+  }
+
+  @override
+  Future<SiteModel> getOne(String id) {
+    return siteCollectionRef
+        .doc(id)
+        .get()
+        .then((DocumentSnapshot doc) => SiteModel.fromSnapshot(doc));
+  }
+
+  @override
+  Map addSiteWorker(SiteModel site, SiteWorker worker) {
+    var responseMap = new Map();
+    try {
+      siteCollectionRef
+          .doc(site.id)
+          .collection("assignWorkers")
+          .add(worker.toJson());
+
+      responseMap["status"] = 'success';
+      responseMap["msg"] = 'Worker assign successfully.';
+      return responseMap;
+    } on FirebaseAuthException catch (e) {
+      print('exception:' + e.toString());
+      print('exception e.code:' + e.code);
+      responseMap["msg"] = e.message;
+      responseMap["status"] = 'failed';
+      return responseMap;
+    }
+  }
+
+  @override
+  Map removeSiteWorker(String siteId, SiteWorker worker) {
+    var responseMap = new Map();
+    try {
+      siteCollectionRef
+          .doc(siteId)
+          .collection("assignWorkers")
+          .doc(worker.id)
+          .delete();
+      responseMap["status"] = 'success';
+      responseMap["msg"] = 'Worker remove successfully.';
+      return responseMap;
+    } on FirebaseAuthException catch (e) {
+      print('exception:' + e.toString());
+      print('exception e.code:' + e.code);
+      responseMap["msg"] = e.message;
+      responseMap["status"] = 'failed';
+      return responseMap;
+    }
+  }
 }
