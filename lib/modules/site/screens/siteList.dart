@@ -1,23 +1,16 @@
 import 'dart:async';
-import 'package:flushbar/flushbar.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:moduler_flutter_app/modules/login/services/auth.dart';
 import 'package:moduler_flutter_app/modules/site/models/siteModel.dart';
 import 'package:moduler_flutter_app/modules/site/screens/siteForm.dart';
 import 'package:moduler_flutter_app/modules/site/screens/siteWorkersList.dart';
 import 'package:moduler_flutter_app/modules/site/services/siteService.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:intl/intl.dart';
 
 class SiteList extends StatefulWidget {
-  static const route = '/';
-
-  SiteList({Key key}) : super(key: key);
-
   @override
   SiteListState createState() => SiteListState();
 }
@@ -47,7 +40,7 @@ class SiteListState extends State<SiteList> {
   void updateSites(QuerySnapshot snapshot) {
     print("updateSites");
     setState(() {
-      sites = SiteService().getActiveSites(snapshot);
+      sites = SiteService().getAllSites(snapshot);
       isLoading = false;
     });
   }
@@ -68,13 +61,9 @@ class SiteListState extends State<SiteList> {
           children: <Widget>[
             Container(
               padding: EdgeInsets.only(left: 0, top: 10, bottom: 10, right: 4),
-              child: Icon(Icons.add, color: Colors.black, size: 15),
+              child: Icon(Icons.add),
             ),
-            Text('Add New Site',
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black))
+            Text('Add New Site', style: TextStyle(fontWeight: FontWeight.w500))
           ],
         ),
       ),
@@ -84,19 +73,15 @@ class SiteListState extends State<SiteList> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.lightBlue[50],
       appBar: new AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 18),
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: new Text('Site List',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black)),
-        backgroundColor: Colors.transparent,
+        title: new Text('Site List'),
         actions: [_newSiteButton()],
       ),
       body: Center(
@@ -183,17 +168,21 @@ class SiteCard extends StatelessWidget {
       child: new Row(
         children: <Widget>[
           Container(
-            width: 130,
+            width: 150,
+            height: 150,
             decoration: BoxDecoration(
                 image: DecorationImage(
-              image: NetworkImage(
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSh3mYv3dNJM69SIHUkZwTerLfncnUN8dXpDw&usqp=CAU'),
+              image: site.sitePhoto == null
+                  ? AssetImage('assets/images/building.png')
+                  : NetworkImage(site.sitePhoto),
               fit: BoxFit.cover,
             )),
           ),
           Flexible(
               child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
                   child: Column(children: <Widget>[
                     Row(children: <Widget>[
                       Text(
@@ -206,55 +195,119 @@ class SiteCard extends StatelessWidget {
                     ]),
                     Row(
                       children: <Widget>[
-                        Text("Start Date : "),
+                        Text(
+                          "Start Date : ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        ),
                         SizedBox(
-                          width: 5,
+                          width: 3,
                         ),
                         Text(
                           site.siteStartDate,
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w300),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
                         )
                       ],
                     ),
                     Row(
                       children: <Widget>[
-                        Text("End Date : "),
+                        Text(
+                          "End Date : ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        ),
                         SizedBox(
-                          width: 5,
+                          width: 3,
                         ),
                         Text(
                           site.siteEndDate,
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w300),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
                         )
                       ],
                     ),
                     Row(
                       children: <Widget>[
-                        Text("Owner : "),
+                        Text(
+                          "Owner : ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        ),
                         SizedBox(
-                          width: 5,
+                          width: 3,
                         ),
                         Text(
                           site.siteOwnerName,
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w300),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
                         )
                       ],
                     ),
                     Row(
                       children: <Widget>[
-                        Text("Budget : "),
-                        SizedBox(
-                          width: 5,
+                        Text(
+                          "Budget : ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
                         ),
-                        Text(site.siteBudget,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.orange,
-                            ))
+                        SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          site.siteBudget,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          "Workers : ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          site.assignWorkersId == null
+                              ? "0"
+                              : site.assignWorkersId.length.toString(),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        )
                       ],
                     ),
                     Row(

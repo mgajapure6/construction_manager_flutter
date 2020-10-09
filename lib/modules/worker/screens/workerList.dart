@@ -5,6 +5,7 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:moduler_flutter_app/modules/worker/models/workerModel.dart';
 import 'package:moduler_flutter_app/modules/worker/screens/workerForm.dart';
 import 'package:moduler_flutter_app/modules/worker/services/workerService.dart';
@@ -42,7 +43,7 @@ class WorkerListState extends State<WorkerList> {
   void updateWorkers(QuerySnapshot snapshot) {
     print("updateWorkers");
     setState(() {
-      workers = WorkerService().getSnapshotWorkers(snapshot);
+      workers = WorkerService().getSnapshotData(snapshot);
       isLoading = false;
     });
   }
@@ -63,13 +64,10 @@ class WorkerListState extends State<WorkerList> {
           children: <Widget>[
             Container(
               padding: EdgeInsets.only(left: 0, top: 10, bottom: 10, right: 4),
-              child: Icon(Icons.add, color: Colors.black, size: 15),
+              child: Icon(Icons.add),
             ),
             Text('Add New Worker',
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black))
+                style: TextStyle(fontWeight: FontWeight.w500))
           ],
         ),
       ),
@@ -79,19 +77,15 @@ class WorkerListState extends State<WorkerList> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.lightBlue[50],
       appBar: new AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 18),
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: new Text('Worker List',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black)),
-        backgroundColor: Colors.transparent,
+        title: new Text('Worker List'),
         actions: [_newWorkerButton()],
       ),
       body: Center(
@@ -180,10 +174,12 @@ class WorkerCard extends StatelessWidget {
         children: <Widget>[
           Container(
             width: 130,
+            height: 130,
             decoration: BoxDecoration(
                 image: DecorationImage(
-              image: NetworkImage(
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSh3mYv3dNJM69SIHUkZwTerLfncnUN8dXpDw&usqp=CAU'),
+              image: worker.photoUrl == null
+                  ? AssetImage('assets/images/worker.png')
+                  : NetworkImage(worker.photoUrl),
               fit: BoxFit.cover,
             )),
           ),
@@ -197,32 +193,56 @@ class WorkerCard extends StatelessWidget {
                         overflow: TextOverflow.fade,
                         softWrap: true,
                         style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 15),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
                       ),
                     ]),
                     Row(
                       children: <Widget>[
-                        Text("Work Start Date : "),
+                        Text(
+                          "Work Start Date : ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        ),
                         SizedBox(
-                          width: 5,
+                          width: 3,
                         ),
                         Text(
                           worker.workStartDate,
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w300),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
                         )
                       ],
                     ),
                     Row(
                       children: <Widget>[
-                        Text("Work End Date : "),
+                        Text(
+                          "Work End Date : ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
+                        ),
                         SizedBox(
-                          width: 5,
+                          width: 3,
                         ),
                         Text(
-                          worker.workEndDate,
+                          worker.workEndDate == null
+                              ? 'Still Working'
+                              : worker.workEndDate,
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w300),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black45,
+                          ),
                         )
                       ],
                     ),
@@ -231,9 +251,11 @@ class WorkerCard extends StatelessWidget {
                       children: <Widget>[
                         Text(worker.workingStatus,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: Colors.green,
+                              color: worker.workingStatus == 'Working'
+                                  ? Colors.green
+                                  : Colors.red,
                             )),
                         PopupMenuButton(
                           itemBuilder: (context) => [

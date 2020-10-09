@@ -1,7 +1,9 @@
+import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:moduler_flutter_app/modules/dashboard/screens/dashboard.dart';
@@ -446,18 +448,19 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
         padding: EdgeInsets.symmetric(vertical: 15),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.grey.shade200,
-                  offset: Offset(2, 4),
-                  blurRadius: 5,
-                  spreadRadius: 2)
-            ],
-            gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+                color: Colors.grey.shade200,
+                offset: Offset(2, 4),
+                blurRadius: 5,
+                spreadRadius: 2),
+          ],
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xfffbb448), Color(0xfff7892b)]),
+        ),
         child: Text(
           'Save Worker',
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -639,6 +642,48 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
     );
   }
 
+  Widget _getAvatarWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          CircularProfileAvatar(
+            null,
+            child: Icon(
+              FontAwesomeIcons.user,
+              size: 100,
+              color: Colors.grey[300],
+            ),
+            borderColor: Colors.grey[300],
+            borderWidth: 3,
+            elevation: 5,
+            radius: 75,
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          RaisedButton.icon(
+              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+              onPressed: () {},
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(50.0))),
+              label: Text(
+                'Upload Image',
+                style: TextStyle(color: Colors.white),
+              ),
+              icon: Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white,
+              ),
+              textColor: Colors.white,
+              splashColor: Colors.red,
+              color: Colors.lightBlue),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -650,12 +695,10 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
               Navigator.pop(context);
             },
           ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
+          //elevation: 2,
+          //iconTheme: IconThemeData(color: Colors.black),
           title: Text(
             widget.flag == 'N' ? 'Add Worker' : 'Update Worker',
-            style: TextStyle(color: Colors.black),
           )),
       body: Container(
         height: height,
@@ -671,9 +714,9 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(height: height * .05),
-                      _title(),
+                      _getAvatarWidget(),
                       SizedBox(
-                        height: 50,
+                        height: 10,
                       ),
                       _formWidget(),
                       SizedBox(

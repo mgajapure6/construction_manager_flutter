@@ -8,9 +8,10 @@ abstract class BaseWorkerService {
   Map updateWorker(WorkerModel worker, String id);
   Map deleteWorker(String id);
   Stream<QuerySnapshot> loadAllWorkers();
-  List<WorkerModel> getSnapshotWorkers(QuerySnapshot snapshot);
+  List<WorkerModel> getSnapshotData(QuerySnapshot snapshot);
   Future<WorkerModel> getOne(String id);
   Stream<QuerySnapshot> loadFreeWorkers();
+  Future<Map> updateWorkerFreeStatus(String id, bool value);
 }
 
 class WorkerService implements BaseWorkerService {
@@ -56,7 +57,7 @@ class WorkerService implements BaseWorkerService {
   }
 
   @override
-  List<WorkerModel> getSnapshotWorkers(QuerySnapshot snapshot) {
+  List<WorkerModel> getSnapshotData(QuerySnapshot snapshot) {
     return snapshot.docs.map((DocumentSnapshot doc) {
       return WorkerModel.fromSnapshot(doc);
     }).toList();
@@ -91,5 +92,31 @@ class WorkerService implements BaseWorkerService {
   @override
   Stream<QuerySnapshot> loadFreeWorkers() {
     return workerCollectionRef.where('isFree', isEqualTo: true).snapshots();
+  }
+
+  @override
+  Future<Map> updateWorkerFreeStatus(String id, bool isFree) async {
+    var responseMap = new Map();
+    try {
+      String workingStatus;
+      if (isFree) {
+        workingStatus = 'Not Working';
+      } else {
+        workingStatus = 'Working';
+      }
+      await workerCollectionRef
+          .doc(id)
+          .update({"isFree": isFree, "workingStatus": workingStatus});
+
+      responseMap["status"] = 'success';
+      responseMap["msg"] = 'Worker updated successfully.';
+      return responseMap;
+    } on FirebaseAuthException catch (e) {
+      print('exception:' + e.toString());
+      print('exception e.code:' + e.code);
+      responseMap["msg"] = e.message;
+      responseMap["status"] = 'failed';
+      return responseMap;
+    }
   }
 }

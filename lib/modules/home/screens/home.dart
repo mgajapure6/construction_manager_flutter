@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:moduler_flutter_app/modules/site/screens/siteList.dart';
+import 'package:moduler_flutter_app/modules/worker/screens/workerAttendance.dart';
 import 'package:moduler_flutter_app/modules/worker/screens/workerList.dart';
+import 'package:moduler_flutter_app/modules/worker/screens/workerPayment.dart';
 import 'package:moduler_flutter_app/utilities/animation/animation1.dart';
 import 'package:moduler_flutter_app/utilities/animation/oval-right-clipper.dart';
 
@@ -47,8 +49,8 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(width: 16.0),
               Expanded(
-                child: _buildMenuTile(context, FontAwesomeIcons.lock, "Workers",
-                    Colors.blue.withOpacity(0.6), new WorkerList()),
+                child: _buildMenuTile(context, FontAwesomeIcons.users,
+                    "Workers", Colors.blue.withOpacity(0.6), new WorkerList()),
               ),
             ],
           ),
@@ -56,32 +58,56 @@ class HomePage extends StatelessWidget {
           Row(
             children: <Widget>[
               Expanded(
-                child: _buildMenuTile(context, FontAwesomeIcons.bookmark,
-                    "Bookmarked wikis", Colors.indigo.withOpacity(0.7), null),
+                child: _buildMenuTile(
+                  context,
+                  FontAwesomeIcons.asterisk,
+                  "Worker Attendance",
+                  Colors.indigo.withOpacity(0.7),
+                  WorkerAttendance(),
+                ),
               ),
               const SizedBox(width: 16.0),
               Expanded(
-                child: _buildMenuTile(context, FontAwesomeIcons.file,
-                    "Templates", Colors.greenAccent, null),
+                child: _buildMenuTile(
+                  context,
+                  FontAwesomeIcons.moneyBill,
+                  "Worker Payment",
+                  Colors.greenAccent,
+                  WorkerPayment(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _buildMenuTile(
+                  context,
+                  FontAwesomeIcons.chartArea,
+                  "Reports",
+                  Colors.pinkAccent,
+                  null,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16.0),
           Text(
-            "Recently Opened Wikis",
+            "Recent Payments",
             style: orangeTextStyle,
           ),
           const SizedBox(height: 10.0),
-          _buildRecentWikiRow(null, "Brand Guideline"),
+          _buildRecentWikiRow(null, "worker 1"),
           const SizedBox(height: 5.0),
-          _buildRecentWikiRow(null, "Project Grail Sprint plan"),
+          _buildRecentWikiRow(null, "worker 2"),
           const SizedBox(height: 5.0),
-          _buildRecentWikiRow(null, "Personal Wiki"),
+          _buildRecentWikiRow(null, "worker 3"),
           const SizedBox(height: 20.0),
           Row(
             children: <Widget>[
               Text(
-                "Channels/Group",
+                "Recent Sites",
                 style: orangeTextStyle,
               ),
               IconButton(
@@ -91,9 +117,9 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
-          _buildChannelListItem("Tixio 2.0"),
-          _buildChannelListItem("Project Grail"),
-          _buildChannelListItem("Fun facts"),
+          _buildChannelListItem("Site 1"),
+          _buildChannelListItem("Site 2"),
+          _buildChannelListItem("Site 3"),
         ],
       ),
     );
@@ -238,20 +264,18 @@ class HomePage extends StatelessWidget {
                     style: TextStyle(color: active, fontSize: 16.0),
                   ),
                   SizedBox(height: 30.0),
-                  _buildRow(Icons.home, "Home"),
+                  _buildRow(new SiteList(), Icons.home, "Sites"),
                   _buildDivider(),
-                  _buildRow(Icons.person_pin, "My profile"),
+                  _buildRow(new WorkerList(), Icons.person_pin, "Workers"),
                   _buildDivider(),
-                  _buildRow(Icons.message, "Messages", showBadge: true),
+                  _buildRow(
+                      new WorkerAttendance(), Icons.event_note, "Attendance"),
                   _buildDivider(),
-                  _buildRow(Icons.notifications, "Notifications",
-                      showBadge: true),
+                  _buildRow(null, Icons.account_balance_wallet, "Payments"),
                   _buildDivider(),
-                  _buildRow(Icons.settings, "Settings"),
+                  _buildRow(null, Icons.insert_chart_outlined, "Reports"),
                   _buildDivider(),
-                  _buildRow(Icons.email, "Contact us"),
-                  _buildDivider(),
-                  _buildRow(Icons.info_outline, "Help"),
+                  _buildRow(null, Icons.login, "Logout"),
                   _buildDivider(),
                 ],
               ),
@@ -268,7 +292,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(IconData icon, String title, {bool showBadge = false}) {
+  Widget _buildRow(dynamic classObj, IconData icon, String title,
+      {bool showBadge = false}) {
     final TextStyle tStyle = TextStyle(color: active, fontSize: 16.0);
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5.0),

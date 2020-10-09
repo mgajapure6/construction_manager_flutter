@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class WorkerModel {
   String id;
+  String refId;
   String workStartDate;
   String workEndDate;
   String fname;
@@ -21,6 +22,9 @@ class WorkerModel {
   String createdBy;
   String updateDate;
   String updatedBy;
+  String attendanceId;
+  String paidStatus;
+  String attendanceStatus;
 
   WorkerModel.empty();
 
@@ -46,27 +50,41 @@ class WorkerModel {
       this.updatedBy);
 
   WorkerModel.withoutCreate(
-      this.workStartDate,
-      this.workEndDate,
-      this.fname,
-      this.lname,
-      this.mname,
-      this.gender,
-      this.age,
-      this.dob,
-      this.mobile,
-      this.idNumber,
-      this.paymentPerDay,
-      this.paymentPerMonth,
-      this.workingStatus,
-      this.isFree,
-      this.photoUrl,
-      this.updateDate,
-      this.updatedBy);
+    this.workStartDate,
+    this.workEndDate,
+    this.fname,
+    this.lname,
+    this.mname,
+    this.gender,
+    this.age,
+    this.dob,
+    this.mobile,
+    this.idNumber,
+    this.paymentPerDay,
+    this.paymentPerMonth,
+    this.workingStatus,
+    this.isFree,
+    this.photoUrl,
+    this.updateDate,
+    this.updatedBy,
+  );
+
+  WorkerModel.attendanceModel(
+    this.attendanceId,
+    this.id,
+    this.fname,
+    this.mname,
+    this.lname,
+    this.photoUrl,
+    this.paymentPerDay,
+    this.paidStatus,
+    this.attendanceStatus,
+  );
 
   WorkerModel.fromSnapshot(DocumentSnapshot snapshot)
       : assert(snapshot != null),
         id = snapshot.id,
+        refId = snapshot.data()['refId'],
         workStartDate = snapshot.data()['workStartDate'],
         workEndDate = snapshot.data()['workEndDate'],
         fname = snapshot.data()['fname'],
@@ -86,8 +104,13 @@ class WorkerModel {
         updateDate = snapshot.data()['updateDate'],
         updatedBy = snapshot.data()['updatedBy'];
 
+  toName() {
+    return {this.fname + " " + this.lname + " " + this.mname};
+  }
+
   toJson() {
     return {
+      "refId": refId,
       "workStartDate": workStartDate,
       "workEndDate": workEndDate,
       "fname": fname,
@@ -102,7 +125,7 @@ class WorkerModel {
       "paymentPerMonth": paymentPerMonth,
       "workingStatus": workingStatus,
       "isFree": isFree,
-      "photoUrl": photoUrl
+      "photoUrl": photoUrl,
     };
   }
 }

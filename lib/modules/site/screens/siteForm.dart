@@ -1,17 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'dart:html';
+
+import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 import 'package:intl/intl.dart';
-import 'package:moduler_flutter_app/modules/dashboard/screens/dashboard.dart';
-import 'package:moduler_flutter_app/modules/login/services/auth.dart';
 import 'package:moduler_flutter_app/modules/site/models/siteModel.dart';
 import 'package:moduler_flutter_app/modules/site/services/siteService.dart';
-import 'package:moduler_flutter_app/utilities/DecimalTextInputFormatter.dart';
-
-import 'package:moduler_flutter_app/utilities/widgets/bezierContainer.dart';
-import 'package:moduler_flutter_app/modules/login/screens/loginPage.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
 class SiteFromPage extends StatefulWidget {
   final String flag;
@@ -170,12 +170,21 @@ class _SiteFromPageState extends State<SiteFromPage> {
     );
   }
 
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+    return double.parse(s, (e) => null) != null;
+  }
+
   Widget _getSiteBudgetTextField() {
     return TextFormField(
       controller: _siteBudgetController,
       validator: (value) {
         if (value.isEmpty) {
           return 'Please enter site budget';
+        } else if (!isNumeric(value)) {
+          return 'Please enter valid amount';
         }
         return null;
       },
@@ -418,6 +427,104 @@ class _SiteFromPageState extends State<SiteFromPage> {
     );
   }
 
+  List<Asset> images = List<Asset>();
+  String _error = 'No Error Dectected';
+  String imageBase64Incode;
+
+  Widget buildGridView() {
+    return GridView.count(
+      crossAxisCount: 3,
+      children: List.generate(images.length, (index) {
+        Asset asset = images[index];
+        return AssetThumb(
+          asset: asset,
+          width: 300,
+          height: 300,
+        );
+      }),
+    );
+  }
+
+  Future<void> loadAssets() async {
+    List<Asset> resultList = List<Asset>();
+    String error = 'No Error Dectected';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 1,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Example App",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() async {
+      images = resultList;
+      _error = error;
+      ByteData byteData =
+          await images[0].getThumbByteData(300, 300, quality: 60);
+      imageBase64Incode = byteData.toString();
+    });
+  }
+
+  Widget _getAvatarWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          CircularProfileAvatar(
+            imageBase64Incode,
+            child: Icon(
+              FontAwesomeIcons.building,
+              size: 100,
+              color: Colors.grey[300],
+            ),
+            borderColor: Colors.grey[300],
+            borderWidth: 3,
+            elevation: 5,
+            radius: 75,
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          RaisedButton.icon(
+              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+              onPressed: () {
+                loadAssets();
+              },
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(50.0))),
+              label: Text(
+                'Upload Image',
+                style: TextStyle(color: Colors.white),
+              ),
+              icon: Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white,
+              ),
+              textColor: Colors.white,
+              splashColor: Colors.red,
+              color: Colors.lightBlue),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -429,12 +536,8 @@ class _SiteFromPageState extends State<SiteFromPage> {
               Navigator.pop(context);
             },
           ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
           title: Text(
             widget.flag == 'N' ? 'Add Site' : 'Update Site',
-            style: TextStyle(color: Colors.black),
           )),
       body: Container(
         height: height,
@@ -450,9 +553,13 @@ class _SiteFromPageState extends State<SiteFromPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(height: height * .05),
-                      _title(),
+                      //_title(),
                       SizedBox(
-                        height: 50,
+                        height: 10,
+                      ),
+                      _getAvatarWidget(),
+                      SizedBox(
+                        height: 10,
                       ),
                       _formWidget(),
                       SizedBox(

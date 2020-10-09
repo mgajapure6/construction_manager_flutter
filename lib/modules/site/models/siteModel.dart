@@ -1,4 +1,8 @@
+import 'dart:html';
+import 'dart:js';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:moduler_flutter_app/modules/worker/models/workerModel.dart';
 
 class SiteModel {
   String id;
@@ -14,7 +18,7 @@ class SiteModel {
   String siteCreatedBy;
   String siteUpdateDate;
   String siteUpdatedBy;
-  List<SiteWorker> assignWorkers;
+  List<dynamic> assignWorkersId;
 
   SiteModel.empty();
 
@@ -53,7 +57,7 @@ class SiteModel {
       this.siteBudget,
       this.sitePhoto,
       this.status,
-      this.assignWorkers);
+      this.assignWorkersId);
 
   SiteModel.fromSnapshot(DocumentSnapshot snapshot)
       : assert(snapshot != null),
@@ -70,7 +74,7 @@ class SiteModel {
         siteUpdateDate = snapshot.data()['siteUpdateDate'],
         siteCreatedBy = snapshot.data()['siteCreatedBy'],
         siteUpdatedBy = snapshot.data()['siteUpdatedBy'],
-        assignWorkers = snapshot.data()['assignWorkers'];
+        assignWorkersId = snapshot.data()['assignWorkersId'];
 
   toJson() {
     return {
@@ -86,78 +90,31 @@ class SiteModel {
       "siteUpdateDate": siteUpdateDate,
       "siteCreatedBy": siteCreatedBy,
       "siteUpdatedBy": siteUpdatedBy,
-      "assignWorkers": assignWorkers
+      "assignWorkersId": assignWorkersId,
     };
   }
 }
 
-class SiteWorker {
-  String id;
-  String workerModelId;
-  String workStartDate;
-  String workEndDate;
-  String fname;
-  String lname;
-  String mname;
-  String gender;
-  String age;
-  String dob;
-  String mobile;
-  String idNumber;
-  String paymentPerDay;
-  String paymentPerMonth;
-  String workingStatus; //working and not working
-  bool isFree;
+// class SiteWorker {
+//   String id;
+//   WorkerModel worker;
+//   String workStartDate;
+//   String workEndDate;
 
-  SiteWorker(
-      this.workStartDate,
-      this.workEndDate,
-      this.fname,
-      this.lname,
-      this.mname,
-      this.gender,
-      this.age,
-      this.dob,
-      this.mobile,
-      this.idNumber,
-      this.paymentPerDay,
-      this.paymentPerMonth,
-      this.workingStatus,
-      this.isFree);
+//   SiteWorker(this.workStartDate, this.workEndDate, this.worker);
 
-  SiteWorker.fromSnapshot(DocumentSnapshot snapshot)
-      : assert(snapshot != null),
-        id = snapshot.id,
-        workerModelId = snapshot.data()['workerModelId'],
-        workStartDate = snapshot.data()['workStartDate'],
-        workEndDate = snapshot.data()['workEndDate'],
-        fname = snapshot.data()['fname'],
-        lname = snapshot.data()['lname'],
-        mname = snapshot.data()['mname'],
-        gender = snapshot.data()['gender'],
-        age = snapshot.data()['age'],
-        dob = snapshot.data()['dob'],
-        mobile = snapshot.data()['mobile'],
-        idNumber = snapshot.data()['idNumber'],
-        paymentPerDay = snapshot.data()['paymentPerDay'],
-        workingStatus = snapshot.data()['workingStatus'];
+//   SiteWorker.fromSnapshot(DocumentSnapshot snapshot)
+//       : assert(snapshot != null),
+//         id = snapshot.id,
+//         worker = snapshot.data()['worker'],
+//         workStartDate = snapshot.data()['workStartDate'],
+//         workEndDate = snapshot.data()['workEndDate'];
 
-  toJson() {
-    return {
-      "workStartDate": workStartDate,
-      "workEndDate": workEndDate,
-      "fname": fname,
-      "lname": lname,
-      "mname": mname,
-      "gender": gender,
-      "age": age,
-      "dob": dob,
-      "mobile": mobile,
-      "idNumber": idNumber,
-      "paymentPerDay": paymentPerDay,
-      "paymentPerMonth": paymentPerMonth,
-      "workingStatus": workingStatus,
-      "isFree": isFree
-    };
-  }
-}
+//   toJson() {
+//     return {
+//       "workStartDate": workStartDate,
+//       "workEndDate": workEndDate,
+//       "worker": {}
+//     };
+//   }
+// }
