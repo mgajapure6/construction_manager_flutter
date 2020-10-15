@@ -14,6 +14,7 @@ class WorkerModel {
   String mobile;
   String idNumber;
   String paymentPerDay;
+  String paymentPerHalfDay;
   String paymentPerMonth;
   String workingStatus; //working and not working
   bool isFree;
@@ -27,6 +28,13 @@ class WorkerModel {
   String attendanceStatus;
 
   WorkerModel.empty();
+  WorkerModel.name(
+    this.fname,
+    this.lname,
+    this.mname,
+    this.gender,
+    this.mobile,
+  );
 
   WorkerModel(
       this.workStartDate,
@@ -40,6 +48,7 @@ class WorkerModel {
       this.mobile,
       this.idNumber,
       this.paymentPerDay,
+      this.paymentPerHalfDay,
       this.paymentPerMonth,
       this.workingStatus,
       this.isFree,
@@ -61,6 +70,7 @@ class WorkerModel {
     this.mobile,
     this.idNumber,
     this.paymentPerDay,
+    this.paymentPerHalfDay,
     this.paymentPerMonth,
     this.workingStatus,
     this.isFree,
@@ -77,6 +87,7 @@ class WorkerModel {
     this.lname,
     this.photoUrl,
     this.paymentPerDay,
+    this.paymentPerHalfDay,
     this.paidStatus,
     this.attendanceStatus,
   );
@@ -96,6 +107,7 @@ class WorkerModel {
         mobile = snapshot.data()['mobile'],
         idNumber = snapshot.data()['idNumber'],
         paymentPerDay = snapshot.data()['paymentPerDay'],
+        paymentPerHalfDay = snapshot.data()['paymentPerHalfDay'],
         workingStatus = snapshot.data()['workingStatus'],
         isFree = snapshot.data()['isFree'],
         photoUrl = snapshot.data()['photoUrl'],
@@ -103,10 +115,6 @@ class WorkerModel {
         createdBy = snapshot.data()['createdBy'],
         updateDate = snapshot.data()['updateDate'],
         updatedBy = snapshot.data()['updatedBy'];
-
-  toName() {
-    return {this.fname + " " + this.lname + " " + this.mname};
-  }
 
   toJson() {
     return {
@@ -122,6 +130,7 @@ class WorkerModel {
       "mobile": mobile,
       "idNumber": idNumber,
       "paymentPerDay": paymentPerDay,
+      "paymentPerHalfDay": paymentPerHalfDay,
       "paymentPerMonth": paymentPerMonth,
       "workingStatus": workingStatus,
       "isFree": isFree,

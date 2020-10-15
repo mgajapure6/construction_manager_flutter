@@ -37,6 +37,7 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
   TextEditingController _mobileController;
   TextEditingController _idNumberController;
   TextEditingController _paymentPerDayController;
+  TextEditingController _paymentHalfDayController;
   TextEditingController _paymentPerMonthController;
 
   final _formKey = GlobalKey<FormState>();
@@ -65,7 +66,8 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
 
       _paymentPerDayController =
           TextEditingController(text: widget.workerModel.paymentPerDay);
-
+      _paymentHalfDayController =
+          TextEditingController(text: widget.workerModel.paymentPerHalfDay);
       _paymentPerMonthController =
           TextEditingController(text: widget.workerModel.paymentPerMonth);
     } else {
@@ -80,6 +82,7 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
       _mobileController = TextEditingController(text: '');
       _idNumberController = TextEditingController(text: '');
       _paymentPerDayController = TextEditingController(text: '');
+      _paymentHalfDayController = TextEditingController(text: '');
       _paymentPerMonthController = TextEditingController(text: '');
     }
   }
@@ -268,6 +271,24 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
     );
   }
 
+  Widget _getPerHalfDayPaymentTextField() {
+    return TextFormField(
+      controller: _paymentHalfDayController,
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter worker half day payment';
+        }
+        return null;
+      },
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+          fillColor: Color(0xfff3f3f4),
+          filled: true,
+          hintText: 'Enter Half Day Payment'),
+    );
+  }
+
   Widget _getPerMonthPaymentTextField() {
     return TextFormField(
       controller: _paymentPerMonthController,
@@ -389,6 +410,7 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
                     _mobileController.text,
                     _idNumberController.text,
                     _paymentPerDayController.text,
+                    _paymentHalfDayController.text,
                     _paymentPerMonthController.text,
                     widget.workerModel.workingStatus,
                     widget.workerModel.isFree,
@@ -409,6 +431,7 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
                 _mobileController.text,
                 _idNumberController.text,
                 _paymentPerDayController.text,
+                _paymentHalfDayController.text,
                 _paymentPerMonthController.text,
                 'Not Working',
                 true,
@@ -435,6 +458,7 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
             _mobileController.clear();
             _idNumberController.clear();
             _paymentPerDayController.clear();
+            _paymentHalfDayController.clear();
             _paymentPerMonthController.clear();
             _displaySnackBar('S', 'Success', result['msg']);
           } else {
@@ -629,13 +653,28 @@ class _WorkerFromPageState extends State<WorkerFromPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Payment Per Day',
+                  'Payment For Full Day',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 SizedBox(
                   height: 10,
                 ),
                 _getPerDayPaymentTextField()
+              ]),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Payment For Half Day',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                _getPerHalfDayPaymentTextField()
               ]),
         ),
       ],

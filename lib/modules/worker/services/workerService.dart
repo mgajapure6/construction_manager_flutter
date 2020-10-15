@@ -12,6 +12,7 @@ abstract class BaseWorkerService {
   Future<WorkerModel> getOne(String id);
   Stream<QuerySnapshot> loadFreeWorkers();
   Future<Map> updateWorkerFreeStatus(String id, bool value);
+  DocumentReference getWorkerDocRef(String id);
 }
 
 class WorkerService implements BaseWorkerService {
@@ -118,5 +119,9 @@ class WorkerService implements BaseWorkerService {
       responseMap["status"] = 'failed';
       return responseMap;
     }
+  }
+
+  DocumentReference getWorkerDocRef(String id) {
+    return workerCollectionRef.doc(id);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:moduler_flutter_app/modules/reports/screens/paymentReport.dart';
 import 'package:moduler_flutter_app/modules/site/screens/siteList.dart';
 import 'package:moduler_flutter_app/modules/worker/screens/workerAttendance.dart';
 import 'package:moduler_flutter_app/modules/worker/screens/workerList.dart';
@@ -85,9 +86,9 @@ class HomePage extends StatelessWidget {
                 child: _buildMenuTile(
                   context,
                   FontAwesomeIcons.chartArea,
-                  "Reports",
+                  "Payment Report",
                   Colors.pinkAccent,
-                  null,
+                  PaymentReport(),
                 ),
               ),
             ],
@@ -273,7 +274,8 @@ class HomePage extends StatelessWidget {
                   _buildDivider(),
                   _buildRow(null, Icons.account_balance_wallet, "Payments"),
                   _buildDivider(),
-                  _buildRow(null, Icons.insert_chart_outlined, "Reports"),
+                  _buildRow(
+                      null, Icons.insert_chart_outlined, "Payment Report"),
                   _buildDivider(),
                   _buildRow(null, Icons.login, "Logout"),
                   _buildDivider(),
